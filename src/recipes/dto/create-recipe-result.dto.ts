@@ -1,9 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import {ApiProperty} from '@nestjs/swagger';
 import {Recipe} from '../entities/recipe.entity';
 
 export class CreateRecipeResultDto {
   @ApiProperty({
-    type: Recipe
+    type: Recipe,
   })
   recipe: Recipe;
 }

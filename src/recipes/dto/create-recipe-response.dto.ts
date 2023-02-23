@@ -1,9 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import {ApiProperty} from '@nestjs/swagger';
 import {CreateRecipeResultDto} from './create-recipe-result.dto';
 
 export class CreateRecipeResponseDto {
   @ApiProperty({
-    type: CreateRecipeResultDto
+    type: CreateRecipeResultDto,
   })
   data: CreateRecipeResultDto;
 }
