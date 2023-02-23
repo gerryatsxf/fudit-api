@@ -1,3 +1,15 @@
+## Description
+
+Fudit is an app to easily _check_ the amount of **kcalories** and **macronutrients** _contained_ in your **daily meals** by _allowing_ the **user**
+to _select_ the ingested **food portions** of a set of specific **foods** for each individual **meal** in the day. The user can _create_ and _update_ new foods and foods composed of other foods (also known as **recipes**) through food portions.
+
+This application is thought for both **nutritionists** and **patients** alike.
+
+It allows the nutritionist to build a **weekly plan** _consisting_ of multiple sets of daily meals, and then _assign_ these weekly plans to either a single **patient** or many of them. Then it will allow the patient to _generate_ **meal variations** for each individual meal or a set of meals given any user defined **dietary constraints**. After _selecting_ a set of foods or meals, the user can get an **analytical breakdown** of what is _being consumed_.
+
+Finally, this will be a **subscription** paid app, so the nutritionist will have to _subscribe_ and _pay_ for any **package** they seem convenient for them. They can choose between the starter and professional packages.
+
+
 ## Data modelling
 
 1. User can _register_ using an __email__ and __password__.
@@ -31,18 +43,9 @@
 - Allow to bulk edit portions by recipe id (?)
 
 
-Fudit is an app to easily _check_ the amount of **kcalories** and **macronutrients** _contained_ in your **daily meals** by _allowing_ the **user**
-to _select_ the ingested **food portions** of a set of specific **foods** for each individual **meal** in the day. The user can _create_ and _update_ new foods and foods composed of other foods (also known as **recipes**) through food portions.
+## API
 
-This application is thought for both **nutritionists** and **patients** alike.
-
-It allows the nutritionist to build a **weekly plan** _consisting_ of multiple sets of daily meals, and then _assign_ these weekly plans to either a single **patient** or many of them. Then it will allow the patient to _generate_ **meal variations** for each individual meal or a set of meals given any user defined **dietary constraints**. After _selecting_ a set of foods or meals, the user can get an **analytical breakdown** of what is _being consumed_.
-
-Finally, this will be a **subscription** paid app, so the nutritionist will have to _subscribe_ and _pay_ for any **package** they seem convenient for them. They can choose between the starter and professional packages.
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Application created with [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 
