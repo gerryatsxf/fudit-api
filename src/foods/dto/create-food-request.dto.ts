@@ -1,16 +1,20 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {IsNumber, IsString} from 'class-validator';
 
 export class CreateFoodRequestDto {
+  @IsString()
   @ApiProperty({
     type: 'string',
   })
   name: string;
 
+  @IsString()
   @ApiProperty({
     type: 'string',
   })
   description: string;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (energy in kcal) of calories per 1 kg of food',
@@ -18,6 +22,7 @@ export class CreateFoodRequestDto {
   })
   kcalPerKg: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of proteins per 1 kg of food',
@@ -25,6 +30,7 @@ export class CreateFoodRequestDto {
   })
   proteinsPerKg: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of carbohydrates per 1 kg of food',
@@ -32,6 +38,7 @@ export class CreateFoodRequestDto {
   })
   carbohydratesPerKg: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of lipids per 1 kg of food',
@@ -39,6 +46,7 @@ export class CreateFoodRequestDto {
   })
   lipidsPerKg: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (energy in kcal) of calories per 1 liter of food',
@@ -46,6 +54,7 @@ export class CreateFoodRequestDto {
   })
   kcalPerLt: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of proteins per 1 litter of food',
@@ -53,6 +62,7 @@ export class CreateFoodRequestDto {
   })
   proteinsPerLt: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of carbohydrates per 1 liter of food',
@@ -60,6 +70,7 @@ export class CreateFoodRequestDto {
   })
   carbohydratesPerLt: number;
 
+  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of lipids per 1 liter of food',

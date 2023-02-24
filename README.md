@@ -32,6 +32,19 @@ Finally, this will be a **subscription** paid app, so the nutritionist will have
 14. User will have option to _update unit of measurement_ of existing portions when selecting a prefered one for a specific food.
 15. User can _bulk update_ the unit of measurement for the list of portions in a recipe
 
+##
+
+Order of builds blocks:
+
+- User
+- SingleFood
+- Units
+- NutritionalInfo
+- ForgedFood
+- Portion
+
+
+
 
 ## TODO:
 
@@ -41,6 +54,8 @@ Finally, this will be a **subscription** paid app, so the nutritionist will have
 - Create a Units module
 - Allow to get portions by recipe id
 - Allow to bulk edit portions by recipe id (?)
+
+- Fix PATCH /foods/:id
 
 
 ## API

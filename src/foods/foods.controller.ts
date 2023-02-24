@@ -21,6 +21,9 @@ import {FindAllFoodResult} from './dto/find-all-food-result.dto';
 import {FindAllFoodResponse} from './dto/find-all-food-response.dto';
 import {UpdateFoodResponseDto} from './dto/udpate-food-response.dto';
 import {UpdateFoodResultDto} from './dto/update-food-result.dto';
+import {plainToClass} from 'class-transformer';
+import {CreateFoodRequestDecorator} from './decorators/create-food-request.decorator';
+import {ValidationPipe} from './pipes/create-food-request.pipe';
 
 @ApiTags('Foods')
 @Controller('foods')
@@ -31,7 +34,7 @@ export class FoodsController {
   @ApiBearerAuth()
   @Post()
   async create(
-    @Body() createFoodDto: CreateFoodRequestDto,
+    @Body(new ValidationPipe()) createFoodDto: CreateFoodRequestDto,
     @Request() req,
   ): Promise<CreateFoodResponseDto> {
     const userId = req.user.properties.id;
@@ -80,7 +83,7 @@ export class FoodsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateFoodDto: UpdateFoodRequestDto,
+    @Body(new ValidationPipe()) updateFoodDto: UpdateFoodRequestDto,
     @Request() req,
   ): Promise<UpdateFoodResponseDto> {
     const userId = req.user.properties.id;

@@ -1,7 +1,10 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {CreateFoodPortionRequestDto} from './create-food-portion-request.dto';
+import {ArrayNotEmpty, IsArray, IsString} from 'class-validator';
 
 export class CreateRecipeRequestDto {
+  @ArrayNotEmpty()
+  @IsArray()
   @ApiProperty({type: [CreateFoodPortionRequestDto]})
   portions: CreateFoodPortionRequestDto[];
 
@@ -10,6 +13,7 @@ export class CreateRecipeRequestDto {
   })
   name: string;
 
+  @IsString()
   @ApiProperty({
     type: 'string',
   })
@@ -20,7 +24,7 @@ export class CreateRecipeRequestDto {
     description: 'Amount (energy in kcal) of calories per 1 kg of food',
     required: false,
   })
-  realKcalPerKg?: number;
+  realKcalPerKg?: number | undefined;
 
   @ApiProperty({
     type: 'number',
