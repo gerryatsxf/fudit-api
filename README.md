@@ -12,20 +12,24 @@ Finally, this will be a **subscription** paid app, so the nutritionist will have
 
 ## Data modelling
 
+User:
 1. User can _register_ using an __email__ and __password__.
 2. User can _login_ using a previously submitted email and password.
 
+Food and Dietary Info:
 3. User can _read_ a list of previously loaded public lists of __single foods__ that he/she _has access to_
 4. User can read the __macronutrients__ and __calories__ contained in each single food being consulted.
 
 5. User can _create_ and _update_ new single foods. 
 6. User can _update_ the macronutrients and calories contained in a single food created by him/her.
 
+Recipes, Portions and Units
 7. User can _create_ and _update_ new composed foods.
 8. User cannot _update_ the macronutrients and calories contained in a composed food created by him/her but can read them.
 9. User can _create_ and _update_ a list of __food portions__ that relates the quantities of a set of foods (either single or composed) that compose a composed food.
 10. User can _update_ the __units__ and __quantity__ in which each food portion is _measured in_.
 
+Equivalences and Preferences
 11. User can set the amount of calories of macronutrients per __weight__ unit or __volume__ unit
 12. User can get the __equivalences__ of a food portion in other units of measurement available.
 13. User can _set_ the __prefered unit of measurement__ for each food, which will _default_ unit of measurement for future created portions.
