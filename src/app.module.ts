@@ -11,6 +11,7 @@ import {SubscriptionModule} from './subscription/subscription.module';
 import {FoodsModule} from './foods/foods.module';
 import {RecipesModule} from './recipes/recipes.module';
 import {PortionsModule} from './portions/portions.module';
+import { DbHandleModule } from './db-handle/db-handle.module';
 
 const NEO4J_SCHEME = 'neo4j+s';
 const NEO4J_HOST = 'a62ce38e.databases.neo4j.io';
@@ -39,6 +40,7 @@ const option: Neo4jConfig = {
     FoodsModule,
     RecipesModule,
     PortionsModule,
+    DbHandleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
