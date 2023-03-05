@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsNumber, IsString} from 'class-validator';
+import {IsNumber, IsPositive, IsString, Min, ValidateIf} from 'class-validator';
 
 export class CreateFoodRequestDto {
   @IsString()
@@ -14,67 +14,82 @@ export class CreateFoodRequestDto {
   })
   description: string;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (energy in kcal) of calories per 1 kg of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   kcalPerKg: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of proteins per 1 kg of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   proteinsPerKg: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of carbohydrates per 1 kg of food',
     required: false,
   })
-  carbohydratesPerKg: number;
-
+  @IsPositive()
   @IsNumber()
+  @ValidateIf((object, value) => value !== null) // TODO: find a way to add error msg to this validation
+  carbohydratesPerKg: number;
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of lipids per 1 kg of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   lipidsPerKg: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (energy in kcal) of calories per 1 liter of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   kcalPerLt: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of proteins per 1 litter of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   proteinsPerLt: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of carbohydrates per 1 liter of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   carbohydratesPerLt: number;
 
-  @IsNumber()
   @ApiProperty({
     type: 'number',
     description: 'Amount (weight in gr) of lipids per 1 liter of food',
     required: false,
   })
+  @IsPositive()
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
   lipidsPerLt: number;
 }

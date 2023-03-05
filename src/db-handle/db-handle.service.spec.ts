@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DbHandleService } from './db-handle.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {DbHandleService} from './db-handle.service';
 
 describe('DbHandleService', () => {
   let service: DbHandleService;

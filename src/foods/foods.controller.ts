@@ -19,11 +19,11 @@ import {FindOneFoodResponseDto} from './dto/find-one-food-response.dto';
 import {CreateFoodResultDto} from './dto/create-food-result.dto';
 import {FindAllFoodResult} from './dto/find-all-food-result.dto';
 import {FindAllFoodResponse} from './dto/find-all-food-response.dto';
-import {UpdateFoodResponseDto} from './dto/udpate-food-response.dto';
-import {UpdateFoodResultDto} from './dto/update-food-result.dto';
-import {plainToClass} from 'class-transformer';
-import {CreateFoodRequestDecorator} from './decorators/create-food-request.decorator';
-import {ValidationPipe} from './pipes/create-food-request.pipe';
+// import {UpdateFoodResponseDto} from './dto/update-food-response.dto';
+// import {UpdateFoodResultDto} from './dto/update-food-result.dto';
+// import {plainToClass} from 'class-transformer';
+// import {CreateFoodRequestDecorator} from './decorators/create-food-request.decorator';
+import {CreateFoodRequestPipe} from './pipes/create-food-request.pipe';
 
 @ApiTags('Foods')
 @Controller('foods')
@@ -34,9 +34,10 @@ export class FoodsController {
   @ApiBearerAuth()
   @Post()
   async create(
-    @Body(new ValidationPipe()) createFoodDto: CreateFoodRequestDto,
+    @Body(new CreateFoodRequestPipe()) createFoodDto: CreateFoodRequestDto,
     @Request() req,
   ): Promise<CreateFoodResponseDto> {
+    console.log('calling create')
     const userId = req.user.properties.id;
     return this.foodsService
       .create(userId, createFoodDto)
@@ -77,24 +78,24 @@ export class FoodsController {
         return response;
       });
   }
-
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body(new ValidationPipe()) updateFoodDto: UpdateFoodRequestDto,
-    @Request() req,
-  ): Promise<UpdateFoodResponseDto> {
-    const userId = req.user.properties.id;
-    return this.foodsService
-      .update(userId, id, updateFoodDto)
-      .then((result: UpdateFoodResultDto) => {
-        const response = new UpdateFoodResponseDto();
-        response.data = result;
-        return response;
-      });
-  }
+  //
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body(new ValidationPipe()) updateFoodDto: UpdateFoodRequestDto,
+  //   @Request() req,
+  // ): Promise<UpdateFoodResponseDto> {
+  //   const userId = req.user.properties.id;
+  //   return this.foodsService
+  //     .update(userId, id, updateFoodDto)
+  //     .then((result: UpdateFoodResultDto) => {
+  //       const response = new UpdateFoodResponseDto();
+  //       response.data = result;
+  //       return response;
+  //     });
+  // }
 
   // @UseGuards(JwtAuthGuard)
   // @ApiBearerAuth()

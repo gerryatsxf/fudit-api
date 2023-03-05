@@ -1,6 +1,6 @@
-import { Controller, Delete, Get } from "@nestjs/common";
+import {Controller, Delete, Get} from '@nestjs/common';
 import {DbHandleService} from './db-handle.service';
-import { ApiTags } from "@nestjs/swagger";
+import {ApiTags} from '@nestjs/swagger';
 
 @ApiTags('Database')
 @Controller('db-handle')

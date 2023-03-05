@@ -1,6 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DbHandleController } from './db-handle.controller';
-import { DbHandleService } from './db-handle.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {DbHandleController} from './db-handle.controller';
+import {DbHandleService} from './db-handle.service';
 
 describe('DbHandleController', () => {
   let controller: DbHandleController;

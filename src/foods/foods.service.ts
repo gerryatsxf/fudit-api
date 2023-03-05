@@ -7,52 +7,84 @@ import {UpdateFoodResultDto} from './dto/update-food-result.dto';
 import {FindOneFoodResultDto} from './dto/find-one-food-result.dto';
 import {Food} from './entities/food.entity';
 import {FindAllFoodResult} from './dto/find-all-food-result.dto';
+import {CreateFoodDbInputDto} from './dto/create-food-db-input.dto';
+
+const USER = 'User';
+const U = 'u';
+
+const HAS_ACCESS_TO = 'HAS_ACCESS_TO';
+
+const FOOD = 'Food';
+const F = 'f';
+
+const CONTAINS = 'CONTAINS';
+const PORTION_OF = 'PORTION_OF';
+
+const DIETARY_INFO = 'DietaryInfo';
+const DI = 'di';
+
+const PORTION = 'Portion';
+const P = 'p';
 
 @Injectable()
 export class FoodsService {
   constructor(private readonly neo4jService: Neo4jService) {}
 
+  private createRequestToDbInput(
+    createFoodDto: CreateFoodRequestDto,
+  ): CreateFoodDbInputDto {
+    // TODO: find a way to insert this logic in the CreateFoodRequestDto class
+    const createFoodDbInput = new CreateFoodDbInputDto();
+    createFoodDbInput.name = createFoodDto.name;
+    createFoodDbInput.description = createFoodDto.description;
+    createFoodDbInput.kcalPerKg = createFoodDto.kcalPerKg;
+    createFoodDbInput.carbohydratesPerKg = createFoodDto.carbohydratesPerKg;
+    createFoodDbInput.proteinsPerKg = createFoodDto.proteinsPerKg;
+    createFoodDbInput.lipidsPerKg = createFoodDto.lipidsPerKg;
+    createFoodDbInput.kcalPerLt = createFoodDto.kcalPerLt;
+    createFoodDbInput.carbohydratesPerLt = createFoodDto.carbohydratesPerLt;
+    createFoodDbInput.proteinsPerLt = createFoodDto.proteinsPerLt;
+    createFoodDbInput.lipidsPerLt = createFoodDto.lipidsPerLt;
+    console.log('createFoodDbInput', createFoodDbInput)
+    return createFoodDbInput;
+  }
+
   private createFoodPropertiesStatements(): string {
     return `
-      SET f.public = False
-      SET f.recipe = False
-      SET f.name = $foodName
-      SET f.description = $foodDescription
-      SET f.kcalPerKg = $kcalPerKg
+      SET ${F}.public = False
+      SET ${F}.recipe = False
+      SET ${F}.name = $name
+      SET ${F}.description = $description
       
-      SET m.description = f.name + ' macronutrients'
-      SET m.carbohydratesPerKg = $carbohydratesPerKg
-      SET m.proteinsPerKg = $proteinsPerKg
-      SET m.lipidsPerKg = $lipidsPerKg
+      
+      SET ${DI}.description = ${F}.name + ' macronutrients'
+      SET ${DI}.kcalPerKg = $kcalPerKg
+      SET ${DI}.carbohydratesPerKg = $carbohydratesPerKg
+      SET ${DI}.proteinsPerKg = $proteinsPerKg
+      SET ${DI}.lipidsPerKg = $lipidsPerKg
+      SET ${DI}.kcalPerLt = $kcalPerLt
+      SET ${DI}.carbohydratesPerLt = $carbohydratesPerLt
+      SET ${DI}.proteinsPerLt = $proteinsPerLt
+      SET ${DI}.lipidsPerLt = $lipidsPerLt
     `;
   }
   async create(
     userId: string,
     createFoodDto: CreateFoodRequestDto,
   ): Promise<CreateFoodResultDto> {
-    const foodName = createFoodDto.name;
-    const foodDescription = createFoodDto.description;
-    const kcalPerKg = createFoodDto.kcalPerKg;
-    const carbohydratesPerKg = createFoodDto.carbohydratesPerKg;
-    const proteinsPerKg = createFoodDto.proteinsPerKg;
-    const lipidsPerKg = createFoodDto.lipidsPerKg;
+    const createFoodDbInput = this.createRequestToDbInput(createFoodDto);
 
     const res = await this.neo4jService.write(
       `
-        MATCH (u:User {id: $userId})
-        MERGE (u)-[:HAS_ACCESS_TO {canEdit:True, canDelete:True, createdByUser: True}]->(f:Food {id: randomUUID()})
-        MERGE (f)-[:CONTAINS]->(m:MacronutrientConfig {id:randomUUID()})
+        MATCH (${U}:${USER} {id: $userId})
+        MERGE (${U})-[:${HAS_ACCESS_TO} {canEdit:True, canDelete:True, createdByUser: True}]->(${F}:${FOOD} {id: randomUUID()})
+        MERGE (${F})-[:${CONTAINS}]->(${DI}:${DIETARY_INFO} {id:randomUUID()})
         ${this.createFoodPropertiesStatements()}
         ${this.forgeFoodsStatements()}
       `,
       {
         userId,
-        foodName,
-        foodDescription,
-        kcalPerKg,
-        carbohydratesPerKg,
-        proteinsPerKg,
-        lipidsPerKg,
+        ...createFoodDbInput,
       },
     );
 
@@ -65,16 +97,19 @@ export class FoodsService {
   private forgeFoodsStatements(): string {
     return `
       WITH { 
-        id: f.id,
-        name: f.name,
-        description: f.description,
-        kcalPerKg: f.kcalPerKg,
-        public: f.public, 
-        recipe: f.recipe,
-        macronutrients: {
-                proteinsPerKg: m.proteinsPerKg,
-                carbohydratesPerKg: m.carbohydratesPerKg,
-                lipidsPerKg: m.lipidsPerKg
+        id: ${F}.id,
+        name: ${F}.name,
+        description: ${F}.description,
+        public: ${F}.public, 
+        dietaryInfo: {
+                proteinsPerKg: ${DI}.proteinsPerKg,
+                carbohydratesPerKg: ${DI}.carbohydratesPerKg,
+                lipidsPerKg: ${DI}.lipidsPerKg,
+                kcalPerKg: ${DI}.kcalPerKg,
+                proteinsPerLt: ${DI}.proteinsPerLt,
+                carbohydratesPerLt: ${DI}.carbohydratesPerLt,
+                lipidsPerLt: ${DI}.lipidsPerLt,
+                kcalPerLt: ${DI}.kcalPerLt
         }
       } AS food
       RETURN food
@@ -83,7 +118,7 @@ export class FoodsService {
   async findAll(userId: string): Promise<FindAllFoodResult> {
     const res = await this.neo4jService.read(
       `
-        MATCH (m:MacronutrientConfig)<-[:CONTAINS]-(f:Food)<-[:HAS_ACCESS_TO]-(u:User {id: $userId})
+        MATCH (${DI}:${DIETARY_INFO})<-[:${CONTAINS}]-(${F}:${FOOD})<-[:${HAS_ACCESS_TO}]-(${U}:${USER} {id: $userId})
         ${this.forgeFoodsStatements()}
       `,
       {userId},
@@ -100,7 +135,7 @@ export class FoodsService {
   async findOne(userId: string, foodId: string): Promise<FindOneFoodResultDto> {
     const res = await this.neo4jService.read(
       `
-        MATCH (m:MacronutrientConfig)<-[:CONTAINS]-(f:Food {id: $foodId})<-[:HAS_ACCESS_TO]-(u:User {id: $userId})
+        MATCH (${DI}:${DIETARY_INFO})<-[:${CONTAINS}]-(${F}:${FOOD} {id: $foodId})<-[:${HAS_ACCESS_TO}]-(${U}:${USER} {id: $userId})
         ${this.forgeFoodsStatements()}
       `,
       {foodId, userId},
@@ -116,29 +151,31 @@ export class FoodsService {
     updateFoodDto: UpdateFoodRequestDto,
   ): string {
     return `
-      ${updateFoodDto.name ? 'SET f.name = $name ' : ''}
-      ${updateFoodDto.description ? 'SET f.description = $description ' : ''}
-      ${updateFoodDto.kcalPerKg ? 'SET f.kcalPerKg = $kcalPerKg ' : ''}
+      ${updateFoodDto.name ? `SET ${F}.name = $name ` : ''}
+      ${updateFoodDto.description ? `SET ${F}.description = $description ` : ''}
+      ${updateFoodDto.kcalPerKg ? `SET ${F}.kcalPerKg = $kcalPerKg ` : ''}
 
       ${
         updateFoodDto.name
           ? `
-          SET m.description = f.name + " macronutrients" 
-          SET p.description = 'Portion of ' + f.name
+          SET ${DI}.description = ${F}.name + " macronutrients" 
+          SET ${P}.description = 'Portion of ' + ${F}.name
           `
           : ''
       }
       ${
         updateFoodDto.carbohydratesPerKg
-          ? 'SET m.carbohydratesPerKg = $carbohydratesPerKg '
+          ? `SET ${DI}.carbohydratesPerKg = $carbohydratesPerKg `
           : ''
       }
       ${
         updateFoodDto.proteinsPerKg
-          ? 'SET m.proteinsPerKg = $proteinsPerKg '
+          ? `SET ${DI}.proteinsPerKg = $proteinsPerKg `
           : ''
       }
-      ${updateFoodDto.lipidsPerKg ? 'SET m.lipidsPerKg = $lipidsPerKg ' : ''}
+      ${
+        updateFoodDto.lipidsPerKg ? `SET ${DI}.lipidsPerKg = $lipidsPerKg ` : ''
+      }
     `;
   }
 
@@ -149,8 +186,8 @@ export class FoodsService {
   ): Promise<UpdateFoodResultDto> {
     const res = await this.neo4jService.write(
       `
-        MATCH (m:MacronutrientConfig)<-[:CONTAINS]-(f:Food {id: $foodId})<-[:HAS_ACCESS_TO]-(u:User {id: $userId})
-        MATCH (p:Portion)-[:PORTION_OF]->(f)
+        MATCH (${DI}:${DIETARY_INFO})<-[:${CONTAINS}]-(${F}:${FOOD} {id: $foodId})<-[:${HAS_ACCESS_TO}]-(${U}:${USER} {id: $userId})
+        MATCH (${P}:${PORTION})-[:${PORTION_OF}]->(${F})
         ${this.forgeUpdateFoodsStatements(updateFoodDto)}
         ${this.forgeFoodsStatements()}
       `,
