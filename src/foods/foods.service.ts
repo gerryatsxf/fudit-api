@@ -45,7 +45,7 @@ export class FoodsService {
     createFoodDbInput.carbohydratesPerLt = createFoodDto.carbohydratesPerLt;
     createFoodDbInput.proteinsPerLt = createFoodDto.proteinsPerLt;
     createFoodDbInput.lipidsPerLt = createFoodDto.lipidsPerLt;
-    console.log('createFoodDbInput', createFoodDbInput)
+    console.log('createFoodDbInput', createFoodDbInput);
     return createFoodDbInput;
   }
 
