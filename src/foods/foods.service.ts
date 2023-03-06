@@ -8,6 +8,7 @@ import {FindOneFoodResultDto} from './dto/find-one-food-result.dto';
 import {Food} from './entities/food.entity';
 import {FindAllFoodResult} from './dto/find-all-food-result.dto';
 import {CreateFoodDbInputDto} from './dto/create-food-db-input.dto';
+import {UpdateFoodDbInputDto} from './dto/update-food-db-input.dto';
 
 const USER = 'User';
 const U = 'u';
@@ -45,7 +46,6 @@ export class FoodsService {
     createFoodDbInput.carbohydratesPerLt = createFoodDto.carbohydratesPerLt;
     createFoodDbInput.proteinsPerLt = createFoodDto.proteinsPerLt;
     createFoodDbInput.lipidsPerLt = createFoodDto.lipidsPerLt;
-    console.log('createFoodDbInput', createFoodDbInput);
     return createFoodDbInput;
   }
 
@@ -147,35 +147,78 @@ export class FoodsService {
     return result;
   }
 
+  private updateRequestToDbInput(
+    updateFoodDto: UpdateFoodRequestDto,
+  ): UpdateFoodDbInputDto {
+    const updateFoodDbInput = new UpdateFoodDbInputDto();
+    updateFoodDbInput.name = updateFoodDto.name;
+    updateFoodDbInput.description = updateFoodDto.description;
+    updateFoodDbInput.kcalPerKg = updateFoodDto.kcalPerKg;
+    updateFoodDbInput.carbohydratesPerKg = updateFoodDto.carbohydratesPerKg;
+    updateFoodDbInput.proteinsPerKg = updateFoodDto.proteinsPerKg;
+    updateFoodDbInput.lipidsPerKg = updateFoodDto.lipidsPerKg;
+    updateFoodDbInput.kcalPerLt = updateFoodDto.kcalPerLt;
+    updateFoodDbInput.carbohydratesPerLt = updateFoodDto.carbohydratesPerLt;
+    updateFoodDbInput.proteinsPerLt = updateFoodDto.proteinsPerLt;
+    updateFoodDbInput.lipidsPerLt = updateFoodDto.lipidsPerLt;
+    return updateFoodDbInput;
+  }
   private forgeUpdateFoodsStatements(
     updateFoodDto: UpdateFoodRequestDto,
   ): string {
     return `
       ${updateFoodDto.name ? `SET ${F}.name = $name ` : ''}
       ${updateFoodDto.description ? `SET ${F}.description = $description ` : ''}
-      ${updateFoodDto.kcalPerKg ? `SET ${F}.kcalPerKg = $kcalPerKg ` : ''}
 
       ${
         updateFoodDto.name
           ? `
           SET ${DI}.description = ${F}.name + " macronutrients" 
-          SET ${P}.description = 'Portion of ' + ${F}.name
+          //SET ${P}.description = 'Portion of ' + ${F}.name
           `
           : ''
       }
       ${
-        updateFoodDto.carbohydratesPerKg
+        updateFoodDto.carbohydratesPerKg !== undefined
           ? `SET ${DI}.carbohydratesPerKg = $carbohydratesPerKg `
           : ''
       }
       ${
-        updateFoodDto.proteinsPerKg
+        updateFoodDto.proteinsPerKg !== undefined
           ? `SET ${DI}.proteinsPerKg = $proteinsPerKg `
           : ''
       }
       ${
-        updateFoodDto.lipidsPerKg ? `SET ${DI}.lipidsPerKg = $lipidsPerKg ` : ''
+        updateFoodDto.lipidsPerKg !== undefined
+          ? `SET ${DI}.lipidsPerKg = $lipidsPerKg `
+          : ''
       }
+      ${
+        updateFoodDto.kcalPerKg !== undefined
+          ? `SET ${DI}.kcalPerKg = $kcalPerKg `
+          : ''
+      }
+      ${
+        updateFoodDto.carbohydratesPerLt !== undefined
+          ? `SET ${DI}.carbohydratesPerLt = $carbohydratesPerLt `
+          : ''
+      }
+      ${
+        updateFoodDto.proteinsPerLt !== undefined
+          ? `SET ${DI}.proteinsPerLt = $proteinsPerLt `
+          : ''
+      }
+      ${
+        updateFoodDto.lipidsPerLt !== undefined
+          ? `SET ${DI}.lipidsPerLt = $lipidsPerLt `
+          : ''
+      }
+      ${
+        updateFoodDto.kcalPerLt !== undefined
+          ? `SET ${DI}.kcalPerLt = $kcalPerLt `
+          : ''
+      }
+      
     `;
   }
 
@@ -184,16 +227,17 @@ export class FoodsService {
     foodId: string,
     updateFoodDto: UpdateFoodRequestDto,
   ): Promise<UpdateFoodResultDto> {
+    const updateFoodDbInput = this.updateRequestToDbInput(updateFoodDto);
     const res = await this.neo4jService.write(
       `
         MATCH (${DI}:${DIETARY_INFO})<-[:${CONTAINS}]-(${F}:${FOOD} {id: $foodId})<-[:${HAS_ACCESS_TO}]-(${U}:${USER} {id: $userId})
-        MATCH (${P}:${PORTION})-[:${PORTION_OF}]->(${F})
-        ${this.forgeUpdateFoodsStatements(updateFoodDto)}
+        // TODO: find a way of integrating inexisting portions
+        //MATCH (${P}:${PORTION})-[:${PORTION_OF}]->(${F})
+        ${this.forgeUpdateFoodsStatements(updateFoodDbInput)}
         ${this.forgeFoodsStatements()}
       `,
-      {userId, foodId, ...updateFoodDto},
+      {userId, foodId, ...updateFoodDbInput},
     );
-
     const food: Food = res.records[0].get('food');
     const result = new UpdateFoodResultDto();
     result.food = food;

@@ -8,7 +8,8 @@ import {validate} from 'class-validator';
 import {plainToInstance} from 'class-transformer';
 
 @Injectable()
-export class CreateFoodRequestPipe implements PipeTransform<any> {
+export class UpdateFoodRequestPipe implements PipeTransform<any> {
+  // TODO: find a way to not repeat this code
   async transform(value: any, {metatype}: ArgumentMetadata) {
     if (
       !metatype
