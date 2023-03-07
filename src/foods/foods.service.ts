@@ -52,10 +52,8 @@ export class FoodsService {
   private createFoodPropertiesStatements(): string {
     return `
       SET ${F}.public = False
-      SET ${F}.recipe = False
       SET ${F}.name = $name
       SET ${F}.description = $description
-      
       
       SET ${DI}.description = ${F}.name + ' macronutrients'
       SET ${DI}.kcalPerKg = $kcalPerKg
