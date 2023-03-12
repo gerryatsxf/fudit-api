@@ -230,6 +230,7 @@ export class FoodsService {
       `
         MATCH (${DI}:${DIETARY_INFO})<-[:${CONTAINS}]-(${F}:${FOOD} {id: $foodId})<-[:${HAS_ACCESS_TO}]-(${U}:${USER} {id: $userId})
         // TODO: find a way of integrating inexisting portions
+        // TODO: uncomment portions MATCH statement when portions are integrated
         //MATCH (${P}:${PORTION})-[:${PORTION_OF}]->(${F})
         ${this.forgeUpdateFoodsStatements(updateFoodDbInput)}
         ${this.forgeFoodsStatements()}

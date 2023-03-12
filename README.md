@@ -41,13 +41,11 @@ Equivalences and Preferences
 Order of builds blocks:
 
 - User
-- SingleFood
+- Food
 - Units
-- NutritionalInfo
-- ForgedFood
+- DietaryInfo
+- Recipe
 - Portion
-
-
 
 
 ## TODO:

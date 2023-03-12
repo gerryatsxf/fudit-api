@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {MacronutrientConfigDto} from '../dto/macronutrient-config.dto';
+import {DietaryInfoDto} from '../dto/dietary-info.dto';
 
 export class Food {
   @ApiProperty({
@@ -29,9 +29,9 @@ export class Food {
   id: string;
 
   @ApiProperty({
-    type: MacronutrientConfigDto,
+    type: DietaryInfoDto,
   })
-  macronutrients: MacronutrientConfigDto;
+  macronutrients: DietaryInfoDto;
 
   @ApiProperty({
     type: 'number',

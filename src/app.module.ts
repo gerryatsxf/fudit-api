@@ -11,7 +11,7 @@ import {SubscriptionModule} from './subscription/subscription.module';
 import {FoodsModule} from './foods/foods.module';
 import {RecipesModule} from './recipes/recipes.module';
 import {PortionsModule} from './portions/portions.module';
-import {DbHandleModule} from './db-handle/db-handle.module';
+import {DbGeneratorModule} from './db-generator/db-generator.module';
 import {UnitsModule} from './units/units.module';
 
 const NEO4J_SCHEME = 'neo4j+s';
@@ -41,7 +41,7 @@ const option: Neo4jConfig = {
     FoodsModule,
     RecipesModule,
     PortionsModule,
-    DbHandleModule,
+    DbGeneratorModule,
     UnitsModule,
   ],
   controllers: [AppController],

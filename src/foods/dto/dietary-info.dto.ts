@@ -1,8 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
 
 // NOTE: Measured in grams
-// NOTE: Not inserting macronutrients in Food nodes because Recipes won't have macronutrients associated, they'll be calculated at runtime
-export class MacronutrientConfigDto {
+// NOTE: Not inserting dietary info in Food nodes because Recipes won't have dietary info associated, they'll be calculated at runtime
+export class DietaryInfoDto {
   @ApiProperty({
     type: 'number',
   })

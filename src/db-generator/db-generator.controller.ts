@@ -1,11 +1,11 @@
 import {Controller, Delete, Get} from '@nestjs/common';
-import {DbHandleService} from './db-handle.service';
+import {DbGeneratorService} from './db-generator.service';
 import {ApiTags} from '@nestjs/swagger';
 
 @ApiTags('Database')
-@Controller('db-handle')
-export class DbHandleController {
-  constructor(private readonly dbHandleService: DbHandleService) {}
+@Controller('db-generator')
+export class DbGeneratorController {
+  constructor(private readonly dbHandleService: DbGeneratorService) {}
   @Get('/graphs/init')
   async createGraphs(): Promise<any> {
     return this.dbHandleService.initGraphs().then((result: any) => {

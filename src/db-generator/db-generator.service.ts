@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Neo4jService} from '../neo4j/neo4j.service';
 
 @Injectable()
-export class DbHandleService {
+export class DbGeneratorService {
   constructor(private readonly neo4jService: Neo4jService) {}
   initGraphs(): Promise<any> {
     const statement = `

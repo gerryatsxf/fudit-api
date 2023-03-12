@@ -10,6 +10,26 @@ import {CreateFoodPortionRequestDto} from './dto/create-food-portion-request.dto
 import {UpdateRecipeRequestDto} from './dto/update-recipe-request.dto';
 import {Recipe} from './entities/recipe.entity';
 
+const USER = 'User';
+const U = 'u';
+
+const UNIT = 'Unit';
+const UN = 'un';
+
+const PORTION = 'Portion';
+const P = 'p';
+
+const FOOD = 'Food';
+const F = 'f';
+
+const RECIPE = 'Recipe';
+const R = 'r';
+
+const PORTION_OF = 'PORTION_OF';
+const USED_IN = 'USED_IN';
+const MEASURED_IN = 'MEASURED_IN';
+const HAS_ACCESS_TO = 'HAS_ACCESS_TO';
+
 @Injectable()
 export class RecipesService {
   constructor(private readonly neo4jService: Neo4jService) {}
@@ -18,23 +38,23 @@ export class RecipesService {
     return `
       WITH r, 
         COLLECT({
-          id: p.id,
-          food:properties(f),
-          quantity:p.quantity,
-          description:p.description,
-          totalKcal: p.quantity*0.001*f.kcalPerKg,
-          unit:properties(units)
+          id: ${P}.id,
+          food:properties(${F}),
+          quantity:${P}.quantity,
+          description:${P}.description,
+          totalKcal: ${P}.quantity*0.001*${F}.kcalPerKg,
+          ${UN}:properties(units)
         }) as portions,
-        sum(p.quantity*0.001*f.kcalPerKg) as kcals
+        sum(${P}.quantity*0.001*${F}.kcalPerKg) as kcals
       WITH { 
-        id: r.id,
-        name: r.name,
-        description: r.description,
-        realKcalPerKg: r.realKcalPerKg,
-        realWeightInKg: r.realWeightInKg,
+        id: ${R}.id,
+        name: ${R}.name,
+        description: ${R}.description,
+        realKcalPerKg: ${R}.realKcalPerKg,
+        realWeightInKg: ${R}.realWeightInKg,
         accumulatedKcal: kcals,
-        public: r.public, 
-        recipe: r.recipe,
+        public: ${R}.public, 
+        recipe: ${R}.recipe,
         portions: portions
       } AS recipe
       RETURN recipe
@@ -51,23 +71,23 @@ export class RecipesService {
     const portions = createRecipeDto.portions;
 
     const rStatement = `
-      MATCH (user:User {id: $userId})
-      MERGE (user)-[:HAS_ACCESS_TO {canEdit:True, canDelete:True, createdByUser: True}]->(r:Recipe {id: randomUUID()})
+      // MATCH (${U}:${USER} {id: $userId})
+      MERGE (${U})-[:${HAS_ACCESS_TO} {canEdit:True, canDelete:True, createdByUser: True}]->(r:${RECIPE} {id: randomUUID()})
 
-      SET r.name = $recipeName
-      SET r.description = $recipeDescription
-      SET r.public = False
-      SET r.recipe = True
-      ${realKcalPerKg ? `SET r.realKcalPerKg = $realKcalPerKg` : ''}
-      ${realWeightInKg ? `SET r.realWeightInKg = $realWeightInKg` : ''}
+      SET ${R}.name = $recipeName
+      SET ${R}.description = $recipeDescription
+      SET ${R}.public = False
+      SET ${R}.recipe = True
+      ${realKcalPerKg ? `SET ${R}.realKcalPerKg = $realKcalPerKg` : ''}
+      ${realWeightInKg ? `SET ${R}.realWeightInKg = $realWeightInKg` : ''}
 
       WITH r
         UNWIND $portions AS portionList
-        MATCH (units:Unit) WHERE units.id = portionList.unitId
-        MATCH (f:Food) WHERE f.id = portionList.foodId
-        MERGE (f)<-[:PORTION_OF]-(p:Portion {id: randomUUID(), quantity: portionList.quantity})-[:MEASURED_IN]->(units)
-        MERGE (p)-[:USED_IN]->(r)
-        SET p.description = 'Portion of ' + f.name
+        MATCH (units:${UNIT}) WHERE units.id = portionList.unitId
+        MATCH (${F}:Food) WHERE ${F}id = portionList.foodId
+        MERGE (${F})<-[:${PORTION}_OF]-(${P}:${PORTION} {id: randomUUID(), quantity: portionList.quantity})-[:${MEASURED_IN}]->(units)
+        MERGE (${P})-[:${USED_IN}]->(${R})
+        SET ${P}.description = 'Portion of ' + ${F}name
       ${this.forgeRecipesStatements()}
     `;
 
@@ -88,8 +108,8 @@ export class RecipesService {
 
   async findAll(userId: string): Promise<FindAllRecipeResultDto> {
     const rStatement = `
-      MATCH (u:User {id: $userId})-[:HAS_ACCESS_TO]->(r:Recipe)<-[:USED_IN]-(p:Portion)-[:MEASURED_IN]->(units:Unit)
-      MATCH (p)-[:PORTION_OF]->(f:Food)
+      MATCH (${U}:${USER} {id: $userId})-[:${HAS_ACCESS_TO}]->(r:${RECIPE})<-[:${USED_IN}]-(${P}:${PORTION})-[:${MEASURED_IN}]->(units:${UNIT})
+      MATCH (${P})-[:${PORTION}_OF]->(${F}:${FOOD}
       ${this.forgeRecipesStatements()}
     `;
     const res = await this.neo4jService.read(rStatement, {
@@ -109,8 +129,8 @@ export class RecipesService {
     recipeId: string,
   ): Promise<FindOneRecipeResultDto> {
     const rStatement = `
-      MATCH (u:User {id: $userId})-[:HAS_ACCESS_TO]->(r:Recipe {id: $recipeId})<-[:USED_IN]-(p:Portion)-[:MEASURED_IN]->(units:Unit)
-      MATCH (p)-[:PORTION_OF]->(f:Food)
+      MATCH (${U}:${USER} {id: $userId})-[:${HAS_ACCESS_TO}]->(${R}:${RECIPE} {id: $recipeId})<-[:${USED_IN}]-(${P}:${PORTION})-[:${MEASURED_IN}]->(units:${UNIT})
+      MATCH (${P})-[:${PORTION_OF}]->(${F}:${FOOD})
       ${this.forgeRecipesStatements()}
     `;
     const res = await this.neo4jService.read(rStatement, {
@@ -128,16 +148,18 @@ export class RecipesService {
     updateRecipeDto: UpdateRecipeRequestDto,
   ): string {
     return `
-      ${updateRecipeDto.name ? 'SET r.name = $name ' : ''}
-      ${updateRecipeDto.description ? 'SET r.description = $description ' : ''}
+      ${updateRecipeDto.name ? `SET ${R}.name = $name` : ''}
+      ${
+        updateRecipeDto.description ? `SET ${R}.description = $description` : ''
+      }
       ${
         updateRecipeDto.realKcalPerKg
-          ? 'SET r.realKcalPerKg = $realKcalPerKg '
+          ? `SET ${R}.realKcalPerKg = $realKcalPerKg`
           : ''
       }
       ${
         updateRecipeDto.realWeightInKg
-          ? 'SET r.realWeightInKg = $realWeightInKg '
+          ? `SET ${R}.realWeightInKg = $realWeightInKg`
           : ''
       }
     `;
@@ -150,8 +172,8 @@ export class RecipesService {
     updateRecipeDto: UpdateRecipeRequestDto,
   ) {
     const rStatement = `
-      MATCH (u:User {id: $userId})-[:HAS_ACCESS_TO]->(r:Recipe {id: $recipeId})<-[:USED_IN]-(p:Portion)-[:MEASURED_IN]->(units:Unit)
-      MATCH (p)-[:PORTION_OF]->(f:Food)
+      MATCH (${U}:${USER} {id: $userId})-[:${HAS_ACCESS_TO}]->(r:${RECIPE} {id: $recipeId})<-[:${USED_IN}]-(${P}:${PORTION})-[:${MEASURED_IN}]->(units:${UNIT})
+      MATCH (${P})-[:${PORTION_OF}]->(${F}:${FOOD})
 
       ${this.forgeUpdateRecipesStatements(updateRecipeDto)}
 
@@ -170,7 +192,4 @@ export class RecipesService {
     return result;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recipe`;
-  }
 }
