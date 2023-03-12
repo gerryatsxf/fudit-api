@@ -1,40 +1,32 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import {Controller, Get, Param, UseGuards} from '@nestjs/common';
 import {UnitsService} from './units.service';
-import {CreateUnitDto} from './dto/create-unit.dto';
-import {UpdateUnitDto} from './dto/update-unit.dto';
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard';
-import {ApiBearerAuth} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 
+@ApiTags('Units')
 @Controller('units')
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
 
   // @Post()
-  // create(@Body() createUnitDto: CreateUnitDto) {
+  // create(@Body() createUnitDto: CreateUnitRequestDto) {
   //   return this.unitsService.create(createUnitDto);
   // }
 
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  findAll() {
+  async findAll() {
     return this.unitsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  findOne(@Param('id') id: string) {
-    return this.unitsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return this.unitsService.findOne(id).then(result => {
+      return result;
+    });
   }
 
   // @Patch(':id')

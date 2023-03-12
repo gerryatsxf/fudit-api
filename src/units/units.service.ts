@@ -1,26 +1,33 @@
 import {Injectable} from '@nestjs/common';
-import {CreateUnitDto} from './dto/create-unit.dto';
-import {UpdateUnitDto} from './dto/update-unit.dto';
+import {FindAllUnitResultDto} from './dto/find-all-unit-result.dto';
+import {Neo4jService} from '../neo4j/neo4j.service';
+import {FindOneUnitResultDto} from './dto/find-one-unit-result.dto';
 
 @Injectable()
 export class UnitsService {
-  create(createUnitDto: CreateUnitDto) {
-    return 'This action adds a new unit';
+  constructor(private readonly neo4jService: Neo4jService) {}
+
+  async findAll(): Promise<FindAllUnitResultDto> {
+    const cStatements = `
+      MATCH (u:Unit)
+      RETURN u
+    `;
+    const res = await this.neo4jService.read(cStatements);
+    const units = res.records.map(record => record.get('u').properties);
+    const result = new FindAllUnitResultDto();
+    result.units = units;
+    return result;
   }
 
-  findAll() {
-    return `This action returns all units`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} unit`;
-  }
-
-  update(id: number, updateUnitDto: UpdateUnitDto) {
-    return `This action updates a #${id} unit`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} unit`;
+  async findOne(id: string): Promise<FindOneUnitResultDto> {
+    const cStatements = `
+      MATCH (u:Unit {id: $id})
+      RETURN u
+    `;
+    const res = await this.neo4jService.read(cStatements, {id});
+    const unit = res.records[0].get('u').properties;
+    const result = new FindOneUnitResultDto();
+    result.unit = unit;
+    return result;
   }
 }
